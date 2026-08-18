@@ -2,6 +2,10 @@
 
 Official web portal for Technocracy, the technical committee of NIT Raipur, featuring a custom Doomsday Era design theme.
 
+🔗 **Live Demo**: [https://tushar-khilwani.github.io/Technocracy/]
+
+---
+
 ## 🏛️ Overview
 
 This web app serves as the central hub for NIT Raipur's flagship technical events, built with a custom cyberpunk aesthetic, interactive physics, dynamic audio UI, and an embedded terminal CLI.
