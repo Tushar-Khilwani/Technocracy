@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technocracy // NIT Raipur — Doomsday Era Technical Committee</title>
+  <meta name="description" content="Technocracy is the official technical committee of NIT Raipur. Cultivating technical mastery, robotics, and innovation across Central India.">
+  <meta name="theme-color" content="#0A0E0C">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+    /* Toast Notification */
+    #tech-toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      background: var(--color-surface-elevated);
+      border: 1px solid var(--color-primary);
+      box-shadow: 0 0 16px var(--color-primary-glow);
+      color: var(--color-text);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      padding: 12px 20px;
+      border-radius: 6px;
+      z-index: 100000;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all var(--transition-normal);
+      pointer-events: none;
+    }
+    #tech-toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====================================================================
+       CINEMATIC DOCTOR DOOM CITADEL PARALLAX BACKGROUND
+       ==================================================================== -->
+  <div id="doomsday-bg-parallax-stage" aria-hidden="true">
+    
+    <!-- Hero Fortress Artwork Parallax Layer -->
+    <div class="parallax-hero-image-wrapper" id="parallax-hero-image-wrapper">
+      <img src="assets/doomsday_fortress_bg.jpeg" alt="Technocracy Latverian Citadel" class="parallax-hero-image" id="parallax-hero-image">
+    </div>
+
+    <!-- Atmospheric Glowing Aurora Shimmer -->
+    <div class="parallax-aurora-glow-overlay"></div>
+
+    <!-- Floating Volumetric Atmospheric Particles Canvas -->
+    <canvas id="parallax-motes-canvas"></canvas>
+
+    <!-- Master Vignette Overlay Ensuring 100% Contrast & Legibility -->
+    <div class="parallax-master-vignette"></div>
+
+  </div>
+
+  <!-- ====================================================================
+       CUSTOM HUD TARGETING RETICLE CURSOR
+       ==================================================================== -->
+  <div id="hud-cursor-container" aria-hidden="true">
+    <div id="hud-cursor-ring"></div>
+    <div id="hud-cursor-dot"></div>
+  </div>
+
+  <!-- Toast Feedback Notification -->
+  <div id="tech-toast" role="status" aria-live="polite"></div>
+
+  <!-- Transmission Video/Audio Feed Modal -->
+  <div id="transmission-modal" class="transmission-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="transmission-modal-window">
+      <div class="transmission-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="hero-badge-live-pulse"></span>
+          <span class="transmission-title">ENCRYPTED TRANSMISSION // NIT_RAIPUR_CHANNEL</span>
+        </div>
+        <button type="button" id="btn-close-transmission" class="btn-close-modal" aria-label="Close Transmission">&times;</button>
+      </div>
+      <div class="transmission-body">
+        <div class="transmission-scan-screen">
+          <p style="color: var(--color-primary); margin-bottom: 8px;">[ORIGIN: TECHNOCRACY COMMITTEE // NIT RAIPUR]</p>
+          <p style="color: #FFFFFF; font-size: 0.95rem; margin-bottom: 12px;">
+            "Technocracy is the official technical committee of NIT Raipur. Our directive is cultivating technical mastery and engineering innovation across Central India through Vigyaan, Ignite, and Aavartan."
+          </p>
+          <p style="color: var(--color-text-muted); font-size: 0.8rem;">
+            &mdash; Sector NIT Raipur, GE Road // HAIL TECHNOCRACY
+          </p>
+        </div>
+        
+        <div class="modal-actions-row">
+          <button type="button" class="btn btn-ghost" onclick="closeTransmissionModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            <span>Dismiss</span>
+          </button>
+          
+          <button type="button" class="btn btn-primary" onclick="showTechToast('NIT Raipur Directive Acknowledged.'); closeTransmissionModal();">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Acknowledge Directive</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Registration Modal (For Events & Schedule) -->
+  <div id="event-reg-modal" class="transmission-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="transmission-modal-window">
+      <div class="transmission-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="hero-badge-live-pulse"></span>
+          <span class="transmission-title" id="event-reg-modal-title">OFFICIAL REGISTRATION // TECHNOCRACY NITRR</span>
+        </div>
+        <button type="button" id="btn-close-event-modal" class="btn-close-modal" aria-label="Close Registration">&times;</button>
+      </div>
+      <div class="transmission-body">
+        <form onsubmit="event.preventDefault(); showTechToast('Registration confirmed for ' + document.getElementById('event-reg-modal-title').textContent); closeEventRegistrationModal(); this.reset();" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label style="display: block; font-family: var(--font-mono); font-size: 0.76rem; color: var(--color-primary); margin-bottom: 4px;">STUDENT / PARTICIPANT NAME</label>
+            <input type="text" required placeholder="e.g. Tushar Verma" style="width: 100%; background: var(--color-surface-elevated); border: 1px solid var(--color-border); padding: 10px; border-radius: 6px; color: var(--color-text); font-family: var(--font-mono); font-size: 0.88rem;">
+          </div>
+          <div>
+            <label style="display: block; font-family: var(--font-mono); font-size: 0.76rem; color: var(--color-primary); margin-bottom: 4px;">COLLEGE / INSTITUTION ROLL NO / EMAIL</label>
+            <input type="email" required placeholder="student@nitrr.ac.in" style="width: 100%; background: var(--color-surface-elevated); border: 1px solid var(--color-border); padding: 10px; border-radius: 6px; color: var(--color-text); font-family: var(--font-mono); font-size: 0.88rem;">
+          </div>
+          <div class="modal-actions-row" style="margin-top: 0.6rem;">
+            <button type="button" class="btn btn-ghost" onclick="closeEventRegistrationModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>Submit Registration</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Corporate Sponsorship Inquiry Modal -->
+  <div id="sponsor-inquiry-modal" class="transmission-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="transmission-modal-window">
+      <div class="transmission-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span class="hero-badge-live-pulse"></span>
+          <span class="transmission-title">CORPORATE PARTNERSHIP INQUIRY // TECHNOCRACY</span>
+        </div>
+        <button type="button" class="btn-close-modal" onclick="closeSponsorInquiryModal()">&times;</button>
+      </div>
+      <div class="transmission-body">
+        <form onsubmit="event.preventDefault(); showTechToast('Partnership proposal received. Our corporate desk will connect shortly.'); closeSponsorInquiryModal(); this.reset();" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <label style="display: block; font-family: var(--font-mono); font-size: 0.76rem; color: var(--color-primary); margin-bottom: 4px;">ORGANIZATION / COMPANY NAME</label>
+            <input type="text" required placeholder="e.g. Acme Technologies Ltd." style="width: 100%; background: var(--color-surface-elevated); border: 1px solid var(--color-border); padding: 10px; border-radius: 6px; color: var(--color-text); font-family: var(--font-mono); font-size: 0.88rem;">
+          </div>
+          <div>
+            <label style="display: block; font-family: var(--font-mono); font-size: 0.76rem; color: var(--color-primary); margin-bottom: 4px;">CORPORATE EMAIL / POINT OF CONTACT</label>
+            <input type="email" required placeholder="partnerships@company.com" style="width: 100%; background: var(--color-surface-elevated); border: 1px solid var(--color-border); padding: 10px; border-radius: 6px; color: var(--color-text); font-family: var(--font-mono); font-size: 0.88rem;">
+          </div>
+          <div class="modal-actions-row" style="margin-top: 0.6rem;">
+            <button type="button" class="btn btn-ghost" onclick="closeSponsorInquiryModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <span>Transmit Partnership Proposal</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOOM'S TERMINAL MODAL (CLEAN & LOGICAL CLI) -->
+  <div id="doom-terminal-modal" class="doom-terminal-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="doom-terminal-modal-window" id="doom-terminal-window">
+      
+      <!-- Terminal Titlebar -->
+      <div class="terminal-window-header">
+        <div class="terminal-titlebar-left">
+          <div class="terminal-window-dots">
+            <span class="window-dot dot-close" id="terminal-dot-close" title="Close Terminal"></span>
+            <span class="window-dot dot-minimize" id="terminal-dot-min" title="Minimize"></span>
+            <span class="window-dot dot-maximize" id="terminal-dot-max" title="Maximize"></span>
+          </div>
+          <span class="terminal-window-title">TECHNOCRACY CLI // NIT RAIPUR [v5.2]</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="terminal-badge-chip">NIT RAIPUR</span>
+          <button type="button" class="btn-close-modal" id="btn-close-terminal-modal" style="color: var(--color-primary); font-size: 1.4rem;">&times;</button>
+        </div>
+      </div>
+
+      <!-- Terminal Output Body -->
+      <div class="terminal-window-body" id="terminal-output-body">
+        <div class="terminal-line-entry">
+          <div class="terminal-response-text">
+==================================================================
+  TECHNOCRACY // NIT RAIPUR COMMAND SHELL (v5.2)
+  Official Technical Committee of National Institute of Technology Raipur
+==================================================================
+Type <span style="color: #FFFFFF; font-weight: bold;">help</span> to inspect valid commands, or click the quick chips below.
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Command Action Chips -->
+      <div class="terminal-quick-chips">
+        <span style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-text-muted); align-self: center;">Run:</span>
+        <button type="button" class="cmd-chip-btn" onclick="executeTerminalCommand('help')">help</button>
+        <button type="button" class="cmd-chip-btn" onclick="executeTerminalCommand('info')">info</button>
+        <button type="button" class="cmd-chip-btn" onclick="executeTerminalCommand('events')">events</button>
+        <button type="button" class="cmd-chip-btn" onclick="executeTerminalCommand('schedule')">schedule</button>
+        <button type="button" class="cmd-chip-btn" onclick="executeTerminalCommand('sponsors')">sponsors</button>
+        <button type="button" class="cmd-chip-btn" onclick="executeTerminalCommand('clear')">clear</button>
+      </div>
+
+      <!-- Command Line Input Row -->
+      <form id="terminal-input-form" class="terminal-input-row" onsubmit="event.preventDefault(); handleTerminalFormSubmit();">
+        <span class="terminal-input-prompt">NITRR@TECH:~$</span>
+        <input type="text" id="terminal-cli-input" class="terminal-cli-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type a command (help, info, events, schedule, sponsors, clear)...">
+      </form>
+
+    </div>
+  </div>
+
+  <!-- App Main Root Container -->
+  <div id="app-root">
+
+    <!-- ====================================================================
+         STATE 1: LOADER COMPONENT (isLoaded = false)
+         ==================================================================== -->
+    <section id="loader-screen" class="state-view" aria-label="Technocracy NIT Raipur Loader">
+      
+      <div class="loader-corner-bracket bracket-tl"></div>
+      <div class="loader-corner-bracket bracket-tr"></div>
+      <div class="loader-corner-bracket bracket-bl"></div>
+      <div class="loader-corner-bracket bracket-br"></div>
+
+      <!-- SCREEN 1: INITIAL SPLASH -->
+      <div id="loader-splash-view">
+        
+        <div class="splash-badge">
+          <span class="splash-badge-dot"></span>
+          <span>OFFICIAL TECHNICAL COMMITTEE // NIT RAIPUR</span>
+        </div>
+
+        <h1 class="splash-title">TECHNOCRACY</h1>
+        <h2 class="splash-subtitle">DOOMSDAY ERA</h2>
+
+        <button type="button" id="btn-enter-domain" class="btn-enter-domain" aria-label="Enter Doom's Domain">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
+          <span>ENTER DOOM'S DOMAIN</span>
+        </button>
+
+      </div>
+
+      <!-- SCREEN 2: 2.5-SECOND CINEMATIC SEQUENCE -->
+      <div id="loader-sequence-view" class="hidden" aria-live="assertive">
+        
+        <div class="hud-spinner-container">
+          <div class="loader-artwork-wrapper">
+            <img src="assets/doomsday_loader_emblem.jpeg" alt="Doctor Doom Reactor Core" class="loader-artwork-img">
+          </div>
+
+          <div class="hud-glyphs-ring">
+            <svg class="glyph-svg-ring" viewBox="0 0 280 280">
+              <path id="glyph-orbit-path" d="M 140, 140 m -120, 0 a 120,120 0 1,1 240,0 a 120,120 0 1,1 -240,0" fill="none"/>
+              <text fill="#00FF66" font-family="'JetBrains Mono', monospace" font-size="9.5" letter-spacing="8" opacity="0.85">
+                <textPath href="#glyph-orbit-path" startOffset="0%">
+                  ᚛ NIT RAIPUR // ᚦ ᚱ ᛟ ᛉ ᚫ ᛏ DOOMSDAY ᛋ ᚲ ᛞ ᛗ // 0x88F ᚜
+                </textPath>
+              </text>
+            </svg>
+          </div>
+
+          <div class="hud-neon-ring"></div>
+        </div>
+
+        <div class="sequence-status-box">
+          <div id="sequence-cycling-text" class="sequence-text">
+            Initializing Protocol 001...
+          </div>
+        </div>
+
+        <div class="sequence-progress-track">
+          <div id="sequence-progress-bar" class="sequence-progress-fill"></div>
+        </div>
+
+        <div class="sequence-footer-telemetry">
+          <span>NIT RAIPUR // TECHNOCRACY</span>
+          <span id="sequence-pct-indicator">0%</span>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ====================================================================
+         STATE 2: MAIN APPLICATION (isLoaded = true)
+         ==================================================================== -->
+    <main id="main-app" class="state-view hidden" aria-label="Technocracy NIT Raipur Portal">
+      
+      <!-- MULTI-PAGE STICKY NAVBAR (WITH SCHEDULE & SPONSORS) -->
+      <nav class="site-navbar" aria-label="Primary Navigation">
+        <div class="nav-container">
+          
+          <a href="#home" class="brand-logo" id="nav-brand-logo" onclick="event.preventDefault(); switchPageTab('home');" aria-label="Technocracy Homepage">
+            <div class="brand-icon-wrapper">
+              <svg class="brand-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L4 6v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V6l-8-4z"/>
+                <path d="M9 11h6"/>
+                <path d="M10 15h4"/>
+              </svg>
+            </div>
+            <div class="brand-text-col">
+              <span class="brand-name">TECHNOCRACY</span>
+              <span class="brand-tagline">NIT RAIPUR // DOOMSDAY ERA</span>
+            </div>
+          </a>
+
+          <!-- Multi-Page State Switcher Tab Links -->
+          <ul class="nav-tab-links">
+            <li>
+              <button type="button" class="nav-tab-btn tab-active" data-tab="home" onclick="switchPageTab('home')">
+                <span>Home</span>
+                <span class="nav-tab-badge">(Protocols)</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-tab-btn" data-tab="events" onclick="switchPageTab('events')">
+                <span>Events</span>
+                <span class="nav-tab-badge">(Domain)</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-tab-btn" data-tab="schedule" onclick="switchPageTab('schedule')">
+                <span>Schedule</span>
+                <span class="nav-tab-badge">(Timeline)</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-tab-btn" data-tab="sponsors" onclick="switchPageTab('sponsors')">
+                <span>Sponsors</span>
+                <span class="nav-tab-badge">(Alliances)</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" class="nav-tab-btn" data-tab="council" onclick="switchPageTab('council')">
+                <span>Council</span>
+                <span class="nav-tab-badge">(Team)</span>
+              </button>
+            </li>
+          </ul>
+
+          <div class="header-cta-group">
+            <button type="button" class="btn-nav-access-terminal" id="btn-nav-terminal" onclick="openDoomTerminal()">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="4 17 10 11 4 5"/>
+                <line x1="12" y1="19" x2="20" y2="19"/>
+              </svg>
+              <span>Access CLI</span>
+            </button>
+          </div>
+
+        </div>
+      </nav>
+
+      <!-- ==================================================================
+           TAB VIEW 1: HOME ('home')
+           ================================================================== -->
+      <section id="tab-view-home" class="page-tab-content tab-visible">
+        
+        <!-- Hero Section -->
+        <div id="hero" class="hero-section">
+          <div class="hero-grid">
+            
+            <div class="hero-left-col">
+              <div class="hero-protocol-badge">
+                <span class="hero-badge-live-pulse"></span>
+                <span>OFFICIAL TECHNICAL COMMITTEE // NIT RAIPUR</span>
+              </div>
+
+              <h1 class="hero-headline">
+                <span class="metallic-green-gradient-text">
+                  THE FUTURE BELONGS TO TECHNOCRACY
+                </span>
+              </h1>
+
+              <p class="hero-subheadline">
+                Technocracy is the official technical committee of NIT Raipur. Our directive is cultivating technical mastery and engineering innovation across Central India.
+              </p>
+
+              <div class="hero-cta-cluster">
+                <button type="button" class="btn-directives-primary" onclick="switchPageTab('events')">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                  <span>Explore Events</span>
+                </button>
+
+                <button type="button" class="btn-transmission-secondary" id="btn-watch-transmission" onclick="openTransmissionModal()">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <span>Watch Transmission</span>
+                </button>
+              </div>
+
+              <div class="hero-stats-matrix">
+                <div class="stat-cell">
+                  <span class="stat-val">NIT Raipur</span>
+                  <span class="stat-caption">Premier Institute</span>
+                </div>
+                <div class="stat-cell">
+                  <span class="stat-val">3 Pillars</span>
+                  <span class="stat-caption">Vigyaan &bull; Ignite &bull; Aavartan</span>
+                </div>
+                <div class="stat-cell">
+                  <span class="stat-val">10,000+</span>
+                  <span class="stat-caption">Annual Footfall</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3D Gauntlet & Cosmic Orb with Floating Particles -->
+            <div class="hero-interactive-stage" id="hero-interactive-stage">
+              
+              <div class="particles-field" id="particles-field" aria-hidden="true">
+                <span class="floating-particle" style="--pos-x: 18%; --delay: 0s; --duration: 4.5s; --drift-x: -25px;"></span>
+                <span class="floating-particle particle-purple" style="--pos-x: 35%; --delay: 1.2s; --duration: 5s; --drift-x: 30px;"></span>
+                <span class="floating-particle" style="--pos-x: 60%; --delay: 2.1s; --duration: 3.8s; --drift-x: -20px;"></span>
+                <span class="floating-particle particle-purple" style="--pos-x: 82%; --delay: 0.7s; --duration: 4.8s; --drift-x: 18px;"></span>
+                <span class="floating-particle" style="--pos-x: 48%; --delay: 3s; --duration: 4.2s; --drift-x: 22px;"></span>
+                <span class="floating-particle particle-purple" style="--pos-x: 72%; --delay: 1.8s; --duration: 5.5s; --drift-x: -35px;"></span>
+              </div>
+
+              <div class="gauntlet-interactive-card" id="gauntlet-card">
+                
+                <div class="cosmic-orb-viewport">
+                  <div class="gyro-ring gyro-ring-outer"></div>
+                  <div class="gyro-ring gyro-ring-middle"></div>
+                  <div class="gyro-ring gyro-ring-inner"></div>
+
+                  <div class="orb-energy-sphere">
+                    <svg class="orb-sigil-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <div class="gauntlet-telemetry-tag">
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <span class="hero-badge-live-pulse"></span>
+                    <span style="color: var(--color-text-muted);">NITRR TECH CORE:</span>
+                  </div>
+                  <span class="gauntlet-output-val" id="gauntlet-power-val">998.4 GW</span>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Directives Section -->
+        <div id="directives" class="section-container" aria-label="Technocracy Directives">
+          <div class="section-header">
+            <span class="section-subtitle">Core Pillars of NIT Raipur</span>
+            <h2 class="section-title">ENGINEERING PROTOCOLS</h2>
+            <p class="section-lead">
+              Cultivating technical mastery, autonomous intelligence, and engineering innovation across Central India.
+            </p>
+          </div>
+
+          <div class="directives-grid">
+            
+            <article class="directive-card" tabindex="0" onclick="switchPageTab('events')">
+              <div class="directive-header-row">
+                <div class="directive-icon-box">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <polyline points="9 9 12 12 9 15"/>
+                    <line x1="13" y1="15" x2="15" y2="15"/>
+                  </svg>
+                </div>
+                <span class="directive-badge">SCIENCE & MODELS</span>
+              </div>
+
+              <h3 class="directive-title">Vigyaan</h3>
+              <p class="directive-desc">
+                National Science & Model Exhibition providing a battleground for innovative concepts, working hardware models, and peer-reviewed scientific posters.
+              </p>
+
+              <ul class="directive-features-list">
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot"></span>
+                  <span>Innovation Arena</span>
+                </li>
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot"></span>
+                  <span>Hardware Prototypes</span>
+                </li>
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot"></span>
+                  <span>Research Posters</span>
+                </li>
+              </ul>
+
+              <div class="directive-action-btn">
+                <span>View Event Hub</span>
+                <span>&rarr;</span>
+              </div>
+            </article>
+
+            <article class="directive-card" tabindex="0" onclick="switchPageTab('events')">
+              <div class="directive-header-row">
+                <div class="directive-icon-box">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <rect x="9" y="9" width="6" height="6"/>
+                    <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/>
+                  </svg>
+                </div>
+                <span class="directive-badge" style="color: #bd7eff; border-color: rgba(138, 43, 226, 0.4);">INTRA-COLLEGE</span>
+              </div>
+
+              <h3 class="directive-title">Ignite</h3>
+              <p class="directive-desc">
+                The intra-college techfest designed specifically for NIT Raipur students to sharpen computational logic, coding speed, and engineering design.
+              </p>
+
+              <ul class="directive-features-list">
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot" style="background: var(--color-secondary); box-shadow: 0 0 6px var(--color-secondary);"></span>
+                  <span>Freshers Code Clash</span>
+                </li>
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot" style="background: var(--color-secondary); box-shadow: 0 0 6px var(--color-secondary);"></span>
+                  <span>Logic Building Gauntlet</span>
+                </li>
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot" style="background: var(--color-secondary); box-shadow: 0 0 6px var(--color-secondary);"></span>
+                  <span>Bridge Craft Architecture</span>
+                </li>
+              </ul>
+
+              <div class="directive-action-btn">
+                <span>View Event Hub</span>
+                <span>&rarr;</span>
+              </div>
+            </article>
+
+            <article class="directive-card" tabindex="0" onclick="switchPageTab('events')">
+              <div class="directive-header-row">
+                <div class="directive-icon-box">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="10" rx="2"/>
+                    <circle cx="12" cy="5" r="2"/>
+                    <path d="M12 7v4"/>
+                    <line x1="8" y1="16" x2="8" y2="16"/>
+                    <line x1="16" y1="16" x2="16" y2="16"/>
+                  </svg>
+                </div>
+                <span class="directive-badge">PREMIER TECHFEST</span>
+              </div>
+
+              <h3 class="directive-title">Aavartan</h3>
+              <p class="directive-desc">
+                Central India's premier annual technical fest attracting thousands of participants across the country for high-octane robotics, hackathons, and AI exhibitions.
+              </p>
+
+              <ul class="directive-features-list">
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot"></span>
+                  <span>Robo Wars (Combat Arena)</span>
+                </li>
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot"></span>
+                  <span>Reverse Coding & Algorithmic Clashes</span>
+                </li>
+                <li class="directive-feature-item">
+                  <span class="directive-bullet-dot"></span>
+                  <span>AI Telemetry & CAD Design</span>
+                </li>
+              </ul>
+
+              <div class="directive-action-btn">
+                <span>View Event Hub</span>
+                <span>&rarr;</span>
+              </div>
+            </article>
+
+          </div>
+
+          <!-- Official Technocracy Mandate Banner -->
+          <div class="manifesto-banner">
+            <blockquote class="manifesto-quote">
+              "Technocracy is the official technical committee of NIT Raipur. Our directive is cultivating technical mastery and engineering innovation across Central India."
+            </blockquote>
+            <cite class="manifesto-author">&mdash; NIT Raipur // HAIL TECHNOCRACY</cite>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================================================================
+           TAB VIEW 2: EVENTS ('events')
+           ================================================================== -->
+      <section id="tab-view-events" class="page-tab-content">
+        
+        <div class="tab-page-hero-header">
+          <div class="tab-page-badge">
+            <span class="hero-badge-live-pulse"></span>
+            <span>NIT RAIPUR TECHNICAL FESTIVALS</span>
+          </div>
+          <h1 class="tab-page-title">OFFICIAL EVENT PILLARS</h1>
+          <p class="tab-page-desc">
+            Discover the three flagship engineering initiatives organized by Technocracy at NIT Raipur. Experience real-time 3D tilt interaction by moving your cursor over each pillar.
+          </p>
+        </div>
+
+        <div class="section-container" style="padding-top: 0;">
+          
+          <div class="events-pillars-container">
+            
+            <!-- PILLAR 1: VIGYAAN -->
+            <article class="tilt-event-card" data-event-name="Vigyaan">
+              <div class="card-gloss-sheen"></div>
+              
+              <div class="tilt-content-z">
+                <div class="pillar-header-row">
+                  <div class="pillar-icon-badge">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                  </div>
+                  <span class="pillar-category-tag">NATIONAL EXHIBITION</span>
+                </div>
+
+                <h2 class="pillar-title">Vigyaan</h2>
+                <div class="pillar-subtitle">National Science & Model Exhibition</div>
+                
+                <p class="pillar-description">
+                  The marquee exhibition where ingenious prototypes and theoretical scientific models from across India come to life. Evaluated by leading scientists and industrial researchers.
+                </p>
+
+                <div class="subevents-title">Flagship Sub-Events:</div>
+                <div class="subevents-badges-list">
+                  <span class="subevent-pill">Innovation Arena</span>
+                  <span class="subevent-pill">Hardware Prototypes</span>
+                  <span class="subevent-pill">Research Posters</span>
+                </div>
+
+                <div class="pillar-footer-row">
+                  <button type="button" class="btn-event-vigyaan" onclick="openEventRegistrationModal('Vigyaan (National Exhibition)')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <span>Register For Vigyaan</span>
+                    <span style="font-size: 1.1rem; margin-left: 2px;">&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <!-- PILLAR 2: IGNITE -->
+            <article class="tilt-event-card" data-event-name="Ignite">
+              <div class="card-gloss-sheen"></div>
+              
+              <div class="tilt-content-z">
+                <div class="pillar-header-row">
+                  <div class="pillar-icon-badge" style="color: #bd7eff; border-color: rgba(138, 43, 226, 0.4);">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                  </div>
+                  <span class="pillar-category-tag" style="color: #bd7eff; border-color: rgba(138, 43, 226, 0.35);">NITRR INTRA-COLLEGE</span>
+                </div>
+
+                <h2 class="pillar-title">Ignite</h2>
+                <div class="pillar-subtitle">Intra-College Techfest for NIT Raipur</div>
+                
+                <p class="pillar-description">
+                  An electrifying technological battleground tailored for NIT Raipur undergraduates to foster peer innovation, rapid coding agility, and structural design mastery.
+                </p>
+
+                <div class="subevents-title">Flagship Sub-Events:</div>
+                <div class="subevents-badges-list">
+                  <span class="subevent-pill">Freshers Code Clash</span>
+                  <span class="subevent-pill">Logic Building</span>
+                  <span class="subevent-pill">Bridge Craft</span>
+                </div>
+
+                <div class="pillar-footer-row">
+                  <button type="button" class="btn-event-ignite" onclick="openEventRegistrationModal('Ignite (Intra-College Techfest)')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                    <span>Register For Ignite</span>
+                    <span style="font-size: 1.1rem; margin-left: 2px;">&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+
+            <!-- PILLAR 3: AAVARTAN -->
+            <article class="tilt-event-card" data-event-name="Aavartan">
+              <div class="card-gloss-sheen"></div>
+              
+              <div class="tilt-content-z">
+                <div class="pillar-header-row">
+                  <div class="pillar-icon-badge">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="11" width="18" height="10" rx="2"/>
+                      <circle cx="12" cy="5" r="2"/>
+                      <path d="M12 7v4"/>
+                      <line x1="8" y1="16" x2="8" y2="16"/>
+                      <line x1="16" y1="16" x2="16" y2="16"/>
+                    </svg>
+                  </div>
+                  <span class="pillar-category-tag">PREMIER TECHFEST</span>
+                </div>
+
+                <h2 class="pillar-title">Aavartan</h2>
+                <div class="pillar-subtitle">Central India's Premier Techfest</div>
+                
+                <p class="pillar-description">
+                  The grand annual festival of NIT Raipur witnessing nationwide participation. Features relentless high-stakes robotics wars, hackathons, CAD modeling, and tech summits.
+                </p>
+
+                <div class="subevents-title">Flagship Sub-Events:</div>
+                <div class="subevents-badges-list">
+                  <span class="subevent-pill">Robo Wars</span>
+                  <span class="subevent-pill">Reverse Coding</span>
+                  <span class="subevent-pill">AI Telemetry</span>
+                  <span class="subevent-pill">CAD Design</span>
+                </div>
+
+                <div class="pillar-footer-row">
+                  <button type="button" class="btn-event-aavartan" onclick="openEventRegistrationModal('Aavartan (Premier Techfest)')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    <span>Register For Aavartan</span>
+                    <span style="font-size: 1.1rem; margin-left: 2px;">&rarr;</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================================================================
+           TAB VIEW 3: SCHEDULE ('schedule') — FEST TIMELINE STREAM
+           ================================================================== -->
+      <section id="tab-view-schedule" class="page-tab-content">
+        
+        <div class="tab-page-hero-header">
+          <div class="tab-page-badge">
+            <span class="hero-badge-live-pulse"></span>
+            <span>CHRONOLOGY MATRIX // FESTIVAL TIMELINE</span>
+          </div>
+          <h1 class="tab-page-title">FESTIVAL SCHEDULE</h1>
+          <p class="tab-page-desc">
+            Explore the complete 2-day itinerary of Vigyaan, Ignite, and Aavartan across NIT Raipur campus venues. Filter by technical track or switch days below.
+          </p>
+        </div>
+
+        <div class="section-container" style="padding-top: 0;">
+          
+          <!-- Schedule Controls (Day Switcher & Track Category Filters) -->
+          <div class="schedule-controls-cluster">
+            
+            <div class="day-switcher-bar">
+              <button type="button" class="btn-day-tab day-active" data-day="day1" onclick="switchScheduleDay('day1')">
+                <span>DAY 01</span>
+                <span class="day-date-tag">// Vigyaan & Prelims</span>
+              </button>
+              <button type="button" class="btn-day-tab" data-day="day2" onclick="switchScheduleDay('day2')">
+                <span>DAY 02</span>
+                <span class="day-date-tag">// Robo Wars & Finals</span>
+              </button>
+            </div>
+
+            <div class="track-filter-chips">
+              <button type="button" class="btn-track-filter filter-active" data-track="all" onclick="filterScheduleTrack('all')">All Tracks</button>
+              <button type="button" class="btn-track-filter" data-track="robotics" onclick="filterScheduleTrack('robotics')">Robotics & Hardware</button>
+              <button type="button" class="btn-track-filter" data-track="coding" onclick="filterScheduleTrack('coding')">Coding & Algorithms</button>
+              <button type="button" class="btn-track-filter" data-track="science" onclick="filterScheduleTrack('science')">Science & Models</button>
+              <button type="button" class="btn-track-filter" data-track="keynote" onclick="filterScheduleTrack('keynote')">Keynotes & Ceremonies</button>
+            </div>
+
+          </div>
+
+          <!-- Timeline Stream -->
+          <div class="timeline-stream-container">
+            
+            <!-- DAY 1 EVENTS -->
+            <div id="schedule-stream-day1" class="schedule-day-group">
+              
+              <div class="timeline-event-row" data-track="keynote">
+                <div class="timeline-node-dot"></div>
+                <div class="timeline-card">
+                  <div class="timeline-header-meta">
+                    <span class="timeline-time-pill">&#9200; 09:30 AM &mdash; 10:30 AM</span>
+                    <span class="timeline-venue-tag">&#128205; Main Auditorium, NIT Raipur</span>
+                  </div>
+                  <h3 class="timeline-event-title">Inaugural Ceremony & Doomsday Keynote</h3>
+                  <p class="timeline-event-brief">
+                    Grand opening remarks by the Director, Faculty In-Charge, and student convenors of Technocracy, inaugurating Vigyaan 2026.
+                  </p>
+                  <div class="timeline-card-footer">
+                    <span class="timeline-track-badge badge-keynote">Keynotes & Ceremonies</span>
+                    <button type="button" class="btn btn-ghost" style="padding: 6px 14px; font-size: 0.76rem;" onclick="showTechToast('Reminder set for Inaugural Ceremony.')">Set Alert</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-event-row" data-track="science">
+                <div class="timeline-node-dot"></div>
+                <div class="timeline-card">
+                  <div class="timeline-header-meta">
+                    <span class="timeline-time-pill">&#9200; 10:45 AM &mdash; 02:00 PM</span>
+                    <span class="timeline-venue-tag">&#128205; Central Exhibition Hall</span>
+                  </div>
+                  <h3 class="timeline-event-title">Vigyaan: National Model Exhibition (Round 1)</h3>
+                  <p class="timeline-event-brief">
+                    Jury evaluation of working hardware models and theoretical scientific prototypes from colleges across India.
+                  </p>
+                  <div class="timeline-card-footer">
+                    <span class="timeline-track-badge badge-science">Science & Models</span>
+                    <button type="button" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.76rem;" onclick="openEventRegistrationModal('Vigyaan Model Exhibition')">Register</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-event-row" data-track="coding">
+                <div class="timeline-node-dot"></div>
+                <div class="timeline-card">
+                  <div class="timeline-header-meta">
+                    <span class="timeline-time-pill">&#9200; 02:30 PM &mdash; 05:00 PM</span>
+                    <span class="timeline-venue-tag">&#128205; Computer Center & Lab 3</span>
+                  </div>
+                  <h3 class="timeline-event-title">Freshers Code Clash & Reverse Coding</h3>
+                  <p class="timeline-event-brief">
+                    Intense timed algorithmic duel where programmers decipher compiled binaries to reconstruct clean logic and pass hidden test cases.
+                  </p>
+                  <div class="timeline-card-footer">
+                    <span class="timeline-track-badge badge-coding">Coding & Algorithms</span>
+                    <button type="button" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.76rem;" onclick="openEventRegistrationModal('Reverse Coding')">Register</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-event-row" data-track="robotics">
+                <div class="timeline-node-dot"></div>
+                <div class="timeline-card">
+                  <div class="timeline-header-meta">
+                    <span class="timeline-time-pill">&#9200; 05:30 PM &mdash; 08:00 PM</span>
+                    <span class="timeline-venue-tag">&#128205; Robotics Testing Pit, GE Road Wing</span>
+                  </div>
+                  <h3 class="timeline-event-title">Autonomous Line Follower & Bot Weigh-Ins</h3>
+                  <p class="timeline-event-brief">
+                    Technical scrutiny and qualification runs for combat robots and obstacle trackers ahead of the heavyweight Robo Wars.
+                  </p>
+                  <div class="timeline-card-footer">
+                    <span class="timeline-track-badge badge-robotics">Robotics & Hardware</span>
+                    <button type="button" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.76rem;" onclick="openEventRegistrationModal('Robo Scrutiny')">Register</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- DAY 2 EVENTS -->
+            <div id="schedule-stream-day2" class="schedule-day-group hidden">
+              
+              <div class="timeline-event-row" data-track="robotics">
+                <div class="timeline-node-dot"></div>
+                <div class="timeline-card">
+                  <div class="timeline-header-meta">
+                    <span class="timeline-time-pill">&#9200; 10:00 AM &mdash; 02:00 PM</span>
+                    <span class="timeline-venue-tag">&#128205; Central Ground Combat Cage</span>
+                  </div>
+                  <h3 class="timeline-event-title">Robo Wars: 15kg & 30kg Heavyweight Gauntlet</h3>
+                  <p class="timeline-event-brief">
+                    High-voltage combat robotics arena where metal clashes against spinning blades, pneumatic flippers, and wedge chassis.
+                  </p>
+                  <div class="timeline-card-footer">
+                    <span class="timeline-track-badge badge-robotics">Robotics & Hardware</span>
+                    <button type="button" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.76rem;" onclick="openEventRegistrationModal('Robo Wars Arena')">Register</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-event-row" data-track="coding">
+                <div class="timeline-node-dot"></div>
+                <div class="timeline-card">
+                  <div class="timeline-header-meta">
+                    <span class="timeline-time-pill">&#9200; 11:30 AM &mdash; 03:30 PM</span>
+                    <span class="timeline-venue-tag">&#128205; CCC Seminar Hall & Cloud Lab</span>
+                  </div>
+                  <h3 class="timeline-event-title">Doomsday 24-Hr Hackathon Final Demos</h3>
+                  <p class="timeline-event-brief">
+                    Shortlisted developer squads present autonomous AI tools, decentralized protocols, and hardware integrations to industry judges.
+                  </p>
+                  <div class="timeline-card-footer">
+                    <span class="timeline-track-badge badge-coding">Coding & Algorithms</span>
+                    <button type="button" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.76rem;" onclick="openEventRegistrationModal('Hackathon Jury')">Register</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-event-row" data-track="science">
+                <div class="timeline-node-dot"></div>
+                <div class="timeline-card">
+                  <div class="timeline-header-meta">
+                    <span class="timeline-time-pill">&#9200; 02:00 PM &mdash; 04:30 PM</span>
+                    <span class="timeline-venue-tag">&#128205; Architecture Gallery</span>
+                  </div>
+                  <h3 class="timeline-event-title">Bridge Craft & Structural Integrity Finals</h3>
+                  <p class="timeline-event-brief">
+                    Popsicle and balsa bridge load-testing gauntlet evaluating maximum weight-bearing efficiency and shear tolerance.
+                  </p>
+                  <div class="timeline-card-footer">
+                    <span class="timeline-track-badge badge-science">Science & Models</span>
+                    <button type="button" class="btn btn-primary" style="padding: 6px 16px; font-size: 0.76rem;" onclick="openEventRegistrationModal('Bridge Craft')">Register</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="timeline-event-row" data-track="keynote">
+                <div class="timeline-node-dot"></div>
+                <div class="timeline-card">
+                  <div class="timeline-header-meta">
+                    <span class="timeline-time-pill">&#9200; 05:30 PM &mdash; 07:30 PM</span>
+                    <span class="timeline-venue-tag">&#128205; Main Auditorium, NIT Raipur</span>
+                  </div>
+                  <h3 class="timeline-event-title">Grand Valedictory & Prize Distribution</h3>
+                  <p class="timeline-event-brief">
+                    Honoring national champions across all Vigyaan, Ignite, and Aavartan arenas with cash prizes, trophies, and certifications.
+                  </p>
+                  <div class="timeline-card-footer">
+                    <span class="timeline-track-badge badge-keynote">Keynotes & Ceremonies</span>
+                    <button type="button" class="btn btn-ghost" style="padding: 6px 14px; font-size: 0.76rem;" onclick="showTechToast('Reminder set for Valedictory Ceremony.')">Set Alert</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==================================================================
+           TAB VIEW 4: SPONSORS ('sponsors') — STRATEGIC ALLIANCES & PARTNERS
+           ================================================================== -->
+      <section id="tab-view-sponsors" class="page-tab-content">
+        
+        <div class="tab-page-hero-header">
+          <div class="tab-page-badge">
+            <span class="hero-badge-live-pulse"></span>
+            <span>STRATEGIC CORPORATE ALLIANCES</span>
+          </div>
+          <h1 class="tab-page-title">OUR SPONSORS & PARTNERS</h1>
+          <p class="tab-page-desc">
+            Empowering youth innovation, technological research, and competitive hackathons across Central India at NIT Raipur.
+          </p>
+        </div>
+
+        <div class="section-container" style="padding-top: 0;">
+          
+          <!-- SECTION 1: STRATEGIC & INDUSTRIAL ALLIANCES -->
+          <div class="sponsors-tier-section">
+            <div class="sponsors-tier-header">
+              <span class="tier-badge-pill tier-title-emerald">
+                <span>&#10003;</span> Strategic Alliances
+              </span>
+              <h2 class="tier-heading-text">Enterprise & Industrial Partners</h2>
+            </div>
+
+            <div class="sponsors-grid-layout">
+              
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                      <polyline points="2 17 12 22 22 17"/>
+                      <polyline points="2 12 12 17 22 12"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip">DIGITAL TRANSFORMATION</span>
+                  <h3 class="sponsor-name">Publicis Sapient</h3>
+                  <p class="sponsor-role-desc">
+                    Global digital business transformation partner supporting enterprise computing challenges and engineering mentorship.
+                  </p>
+                </div>
+              </article>
+
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip">ENERGY & POWER ALLIANCE</span>
+                  <h3 class="sponsor-name">NTPC Limited</h3>
+                  <p class="sponsor-role-desc">
+                    India's largest energy conglomerate powering sustainable engineering models and national science exhibitions at Vigyaan.
+                  </p>
+                </div>
+              </article>
+
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle" style="color: #66ffaa; border-color: #66ffaa;">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="4" width="20" height="16" rx="2"/>
+                      <line x1="2" y1="10" x2="22" y2="10"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip">BANKING & FINTECH PARTNER</span>
+                  <h3 class="sponsor-name">State Bank of India</h3>
+                  <p class="sponsor-role-desc">
+                    Premier financial institution supporting nationwide student participation, grant stipends, and prize allocations.
+                  </p>
+                </div>
+              </article>
+
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                      <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip">STATE INDUSTRIAL BOARD</span>
+                  <h3 class="sponsor-name">CSIDC</h3>
+                  <p class="sponsor-role-desc">
+                    Chhattisgarh State Industrial Development Corporation fostering regional entrepreneurship and hardware innovation.
+                  </p>
+                </div>
+              </article>
+
+            </div>
+          </div>
+
+          <!-- SECTION 2: PLATFORM, CODING & TECH ECOSYSTEM -->
+          <div class="sponsors-tier-section">
+            <div class="sponsors-tier-header">
+              <span class="tier-badge-pill tier-title-purple">
+                <span>&lt;/&gt;</span> Tech Ecosystem
+              </span>
+              <h2 class="tier-heading-text">Coding & Platform Partners</h2>
+            </div>
+
+            <div class="sponsors-grid-layout">
+              
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle" style="color: #bd7eff; border-color: #8A2BE2;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+                      <path d="M2 12h20"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip" style="color: #bd7eff; border-color: rgba(138, 43, 226, 0.4);">PLATFORM PARTNER</span>
+                  <h3 class="sponsor-name">Unstop</h3>
+                  <p class="sponsor-role-desc">
+                    Seamless national portal for student registrations, hackathon submissions, and leaderboard tracking.
+                  </p>
+                </div>
+              </article>
+
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle" style="color: var(--color-primary); border-color: var(--color-primary);">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="16 18 22 12 16 6"/>
+                      <polyline points="8 6 2 12 8 18"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip">KNOWLEDGE PARTNER</span>
+                  <h3 class="sponsor-name">GeeksforGeeks</h3>
+                  <p class="sponsor-role-desc">
+                    Empowering Reverse Coding, algorithmic problem tracks, and developer course scholarships for winners.
+                  </p>
+                </div>
+              </article>
+
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle" style="color: #bd7eff; border-color: #8A2BE2;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                      <line x1="8" y1="21" x2="16" y2="21"/>
+                      <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip" style="color: #bd7eff; border-color: rgba(138, 43, 226, 0.4);">HACKATHON INFRA</span>
+                  <h3 class="sponsor-name">Devfolio</h3>
+                  <p class="sponsor-role-desc">
+                    Decentralized judging and project showcase platform for the 48-hour continuous Doomsday Hackathon.
+                  </p>
+                </div>
+              </article>
+
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip">DEV ECOSYSTEM</span>
+                  <h3 class="sponsor-name">GitHub</h3>
+                  <p class="sponsor-role-desc">
+                    Providing student developer packs, repository management tools, and open-source contribution bounties.
+                  </p>
+                </div>
+              </article>
+
+            </div>
+          </div>
+
+          <!-- SECTION 3: ENERGY & MEDIA PARTNERS -->
+          <div class="sponsors-tier-section">
+            <div class="sponsors-tier-header">
+              <span class="tier-badge-pill tier-title-emerald">
+                <span>&#9889;</span> Media & Outreach
+              </span>
+              <h2 class="tier-heading-text">Energy & Media Partners</h2>
+            </div>
+
+            <div class="sponsors-grid-layout">
+              
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle" style="color: #ff5f56; border-color: #ff5f56;">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip" style="color: #ff7a70; border-color: rgba(255, 95, 86, 0.4);">ENERGY PARTNER</span>
+                  <h3 class="sponsor-name">Red Bull</h3>
+                  <p class="sponsor-role-desc">
+                    Fueling hackathon war rooms, high-intensity gaming rings, and the Robo Wars combat arena.
+                  </p>
+                </div>
+              </article>
+
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="2"/>
+                      <path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip">RADIO PARTNER</span>
+                  <h3 class="sponsor-name">Radio Mirchi 98.3</h3>
+                  <p class="sponsor-role-desc">
+                    Exclusive radio broadcasting partner carrying festival promos and live campus updates across Chhattisgarh.
+                  </p>
+                </div>
+              </article>
+
+              <article class="tilt-sponsor-card">
+                <div class="card-gloss-sheen"></div>
+                <div class="tilt-content-z">
+                  <div class="sponsor-icon-circle">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/>
+                      <path d="M18 14h-8"/>
+                      <path d="M15 18h-5"/>
+                      <path d="M10 6h8v4h-8V6Z"/>
+                    </svg>
+                  </div>
+                  <span class="sponsor-category-chip">PRINT & PRESS PARTNER</span>
+                  <h3 class="sponsor-name">National Press Bureau</h3>
+                  <p class="sponsor-role-desc">
+                    Daily print coverage and press briefings highlighting winning prototypes and research milestones.
+                  </p>
+                </div>
+              </article>
+
+            </div>
+          </div>
+
+          <!-- SPONSORSHIP BROCHURE DOWNLOAD & INQUIRY BANNER -->
+          <div class="sponsorship-deck-banner">
+            <h2 class="deck-banner-title">BECOME A CORPORATE ALLIANCE</h2>
+            <p class="deck-banner-lead">
+              Partner with Technocracy, NIT Raipur for Aavartan 2026. Gain extensive brand visibility across 10,000+ top engineering minds, researchers, and tech pioneers.
+            </p>
+            <div class="deck-actions-cluster">
+              <button type="button" class="btn btn-primary" onclick="downloadSponsorshipDeck()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>Download Sponsorship Deck (PDF)</span>
+              </button>
+
+              <button type="button" class="btn btn-secondary" onclick="openSponsorInquiryModal()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <span>Inquire For Partnerships</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ==================================================================
+           TAB VIEW 5: COUNCIL ('council') — READ-ONLY CLEAN DOSSIERS
+           ================================================================== -->
+      <section id="tab-view-council" class="page-tab-content">
+        
+        <div class="tab-page-hero-header">
+          <div class="tab-page-badge">
+            <span class="hero-badge-live-pulse"></span>
+            <span>COMMITTEE ARCHITECTURE // NIT RAIPUR</span>
+          </div>
+          <h1 class="tab-page-title">THE SUPREME LATVERIAN COUNCIL</h1>
+          <p class="tab-page-desc">
+            The student executive leadership and domain heads guiding Technocracy's core technical divisions at NIT Raipur.
+          </p>
+        </div>
+
+        <div class="section-container" style="padding-top: 0;">
+          
+          <div class="council-dossier-grid">
+            
+            <!-- Leader 1 -->
+            <article class="council-member-card">
+              <div class="council-avatar-halo">
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L4 6v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V6l-8-4z"/>
+                  <path d="M9 11h6"/>
+                </svg>
+              </div>
+              <span class="council-role-badge">OVERALL COORDINATOR</span>
+              <h3 class="council-name">Head Coordinator</h3>
+              <div class="council-specialization">Executive Operations & Techfest Management</div>
+              <p class="council-bio">
+                Directs committee synchronization across Vigyaan, Ignite, and Aavartan, overseeing institute partnerships and technical execution.
+              </p>
+              <div class="council-skills-row">
+                <span class="skill-chip">Strategic Leadership</span>
+                <span class="skill-chip">Techfest Ops</span>
+                <span class="skill-chip">Event Directives</span>
+              </div>
+            </article>
+
+            <!-- Leader 2 -->
+            <article class="council-member-card">
+              <div class="council-avatar-halo" style="border-color: #8A2BE2; color: #bd7eff; box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);">
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="16 18 22 12 16 6"/>
+                  <polyline points="8 6 2 12 8 18"/>
+                </svg>
+              </div>
+              <span class="council-role-badge" style="color: #bd7eff; border-color: rgba(138, 43, 226, 0.4);">SOFTWARE & WEB</span>
+              <h3 class="council-name">Technical Lead</h3>
+              <div class="council-specialization">Full-Stack Platforms & Algorithmic Sieges</div>
+              <p class="council-bio">
+                Architects portal infrastructure, real-time leaderboard scoring systems, and competitive reverse-coding judges.
+              </p>
+              <div class="council-skills-row">
+                <span class="skill-chip">Full Stack</span>
+                <span class="skill-chip">Cloud Infra</span>
+                <span class="skill-chip">Algorithm Design</span>
+              </div>
+            </article>
+
+            <!-- Leader 3 -->
+            <article class="council-member-card">
+              <div class="council-avatar-halo">
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="4" y="4" width="16" height="16" rx="2"/>
+                  <rect x="9" y="9" width="6" height="6"/>
+                </svg>
+              </div>
+              <span class="council-role-badge">ROBOTICS & HARDWARE</span>
+              <h3 class="council-name">Robotics Head</h3>
+              <div class="council-specialization">Robo Wars Arena & Microcontrollers</div>
+              <p class="council-bio">
+                Constructs high-torque combat bots, obstacle tracks, autonomous line followers, and edge telemetry units for Aavartan.
+              </p>
+              <div class="council-skills-row">
+                <span class="skill-chip">Embedded C</span>
+                <span class="skill-chip">Robotics Arena</span>
+                <span class="skill-chip">Motor Drivers</span>
+              </div>
+            </article>
+
+            <!-- Leader 4 -->
+            <article class="council-member-card">
+              <div class="council-avatar-halo" style="border-color: #8A2BE2; color: #bd7eff; box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);">
+                <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/>
+                </svg>
+              </div>
+              <span class="council-role-badge" style="color: #bd7eff; border-color: rgba(138, 43, 226, 0.4);">AI & RESEARCH</span>
+              <h3 class="council-name">Research Coordinator</h3>
+              <div class="council-specialization">Vigyaan Model Jury & Poster Review</div>
+              <p class="council-bio">
+                Evaluates national science submissions, prototypes, and coordinates research papers for academic publications.
+              </p>
+              <div class="council-skills-row">
+                <span class="skill-chip">Applied AI</span>
+                <span class="skill-chip">Model Vetting</span>
+                <span class="skill-chip">Science Jury</span>
+              </div>
+            </article>
+
+          </div>
+
+          <!-- Official Oath Banner -->
+          <div class="manifesto-banner" style="margin-top: 0;">
+            <blockquote class="manifesto-quote">
+              "Cultivating technical mastery, empirical rigour, and engineering supremacy across Central India."
+            </blockquote>
+            <cite class="manifesto-author">&mdash; Technocracy Committee // NIT Raipur</cite>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- INDUSTRIAL CYBER-FOOTER (REAL NIT RAIPUR DETAILS) -->
+      <footer class="cyber-footer" aria-label="Site Footer">
+        <div class="footer-inner-grid">
+          
+          <div class="footer-brand-col">
+            <div class="brand-logo">
+              <div class="brand-icon-wrapper">
+                <svg class="brand-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2L4 6v6c0 5.5 3.5 10 8 11 4.5-1 8-5.5 8-11V6l-8-4z"/>
+                  <path d="M9 11h6"/>
+                  <path d="M10 15h4"/>
+                </svg>
+              </div>
+              <span class="brand-name">TECHNOCRACY</span>
+            </div>
+            <p class="footer-brand-bio">
+              The official technical committee of NIT Raipur. Cultivating technical mastery and engineering innovation across Central India through Vigyaan, Ignite, and Aavartan.
+            </p>
+            <div class="footer-battle-cry">HAIL TECHNOCRACY</div>
+          </div>
+
+          <div>
+            <h4 class="footer-col-title">Festivals & Alliances</h4>
+            <ul class="footer-nav-list">
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('events')">Vigyaan (Exhibition)</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('events')">Ignite (Intra-College)</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('events')">Aavartan (Techfest)</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('schedule')">Event Schedule</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('sponsors')">Corporate Sponsors</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="openDoomTerminal()">Launch Terminal CLI</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="footer-col-title">Navigation</h4>
+            <ul class="footer-nav-list">
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('home')">Home & Protocols</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('events')">Domain & Events</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('schedule')">Fest Schedule</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('sponsors')">Strategic Sponsors</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="switchPageTab('council')">Supreme Council</button></li>
+              <li class="footer-nav-item"><button type="button" onclick="openTransmissionModal()">NITRR Transmission</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="footer-col-title">Contact & Base</h4>
+            <div class="footer-contact-details">
+              <div class="contact-detail-line">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <span>nitrr.technocracy@gmail.com</span>
+              </div>
+              <div class="contact-detail-line">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                <span>Sector NIT Raipur, GE Road, Raipur, Chhattisgarh</span>
+              </div>
+            </div>
+
+            <div class="social-links-grid">
+              
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-cyber-btn" aria-label="GitHub">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                </svg>
+                <span>GitHub</span>
+              </a>
+
+              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="social-cyber-btn" aria-label="Discord">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M18 6h0a14.5 14.5 0 0 0-4-1.2 1 1 0 0 0-.5.4 17 17 0 0 0-.8 1.6 13.6 13.6 0 0 0-5.4 0A17 17 0 0 0 6.5 5.2a1 1 0 0 0-.5-.4A14.5 14.5 0 0 0 2 6c0 0-2 6.5-1 12a14.8 14.8 0 0 0 4.5 2.3 1 1 0 0 0 .6-.2 10.8 10.8 0 0 0 1-1.6 1 1 0 0 0-.5-.7 9.8 9.8 0 0 1-1.4-.7.8.8 0 0 1 .1-1.3 10.4 10.4 0 0 0 13.4 0 .8.8 0 0 1 .1 1.3 9.8 9.8 0 0 1-1.4.7 1 1 0 0 0-.5.7 10.8 10.8 0 0 0 1 1.6 1 1 0 0 0 .6.2A14.8 14.8 0 0 0 23 18c1-5.5-1-12-1-12z"/>
+                  <circle cx="8.5" cy="12.5" r="1.5" fill="currentColor"/>
+                  <circle cx="15.5" cy="12.5" r="1.5" fill="currentColor"/>
+                </svg>
+                <span>Discord</span>
+              </a>
+
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-cyber-btn" aria-label="LinkedIn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+                  <rect x="2" y="9" width="4" height="12"/>
+                  <circle cx="4" cy="4" r="2"/>
+                </svg>
+                <span>LinkedIn</span>
+              </a>
+
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="social-cyber-btn" aria-label="X">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4l11.733 16h4.267l-11.733-16z"/>
+                  <path d="M4 20l6.768-6.768M20 4l-6.768 6.768"/>
+                </svg>
+                <span>X</span>
+              </a>
+
+            </div>
+          </div>
+
+        </div>
+
+        <div class="footer-bottom-bar">
+          <div class="footer-rights-statement">
+            TECHNOCRACY &copy; 2026 | OFFICIAL TECHNICAL COMMITTEE OF <span class="highlight-latveria">NIT RAIPUR</span>
+          </div>
+          <div>
+            <span>COMMUNICATION: nitrr.technocracy@gmail.com</span>
+          </div>
+        </div>
+      </footer>
+
+      <!-- FLOATING TERMINAL TRIGGER WIDGET -->
+      <button type="button" class="floating-terminal-trigger" id="btn-floating-terminal" onclick="openDoomTerminal()" title="Launch CLI Terminal">
+        <span class="terminal-trigger-pulse"></span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="4 17 10 11 4 5"/>
+          <line x1="12" y1="19" x2="20" y2="19"/>
+        </svg>
+        <span>Technocracy CLI</span>
+      </button>
+
+    </main>
+
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
